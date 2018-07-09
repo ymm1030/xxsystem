@@ -131,7 +131,7 @@ class YmmDB(object):
         return l
 
 if __name__ == '__main__':
-    t = YmmDB('root', 'ymm1030', 'xxdxx_01')
+    t = YmmDB('root', 'ymm', 'xxdxx_01')
     t.connect_to_db('20180709')
     t.updateRecord('YSL', 20, 10, '')
     t.updateRecord('burger', 10, 5, '')

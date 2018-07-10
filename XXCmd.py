@@ -82,16 +82,55 @@ class AddSoldAndBoughtCmd(CmdBase):
                 self.result_ = "添加产品[%s]失败！" % (self.product_)
 
 class ListCmd(CmdBase):
-    pass
+    def __init__(self, db, product_only):
+        super(ListCmd, self).__init__(db)
+        self.product_only_ = product_only
+
+    def execute(self):
+        l = []
+        if self.product_only_:
+            l = self.db.products()
+        else:
+            l = self.db.records()
+        for one in l:
+            if self.product_only_:
+                self.result_ += one + '\n'
+            else:
+                self.result_ += "产品：[%s] 卖出[%d] 买入[%d]" % (one[PRODUCT], one[SOLD], one[BOUGHT])
+                if len(one[CODE]):
+                    self.result_ += " 条码[%s]" % one[CODE]
+                self.result_ += '\n'
 
 class ResetCmd(CmdBase):
-    pass
+    def __init__(self, db, product, sold, bought, code):
+        super(ResetCmd, self).__init__(db)
+        self.product_ = product
+        self.sold_ = sold
+        self.bought_ = bought
+        self.code_ = code
+
+    def execute(self):
+        l = self.db.get(self.product_)
+        if len(l):
+            if self.db.update(self.product_, self.sold_, self.bought_, self.code_):
+                self.result_ = "更新产品[%s]成功,卖出[%d],买入[%d]" % (self.product_, self.sold_, self.bought_)
+                if len(self.code_):
+                    self.result_ += ",条码[%s]" % self.code_
+            else:
+                self.result_ = "更新产品[%s]失败！" % self.product_
+        else:
+            if self.db.add(self.product_, self.sold_, self.bought_, self.code_):
+                self.result_ = "成功添加产品[%s],卖出[%d],买入[%d]" % (self.product_, self.sold_, self.bought_)
+                if len(self.code_):
+                    self.result_ += ",条码[%s]" % self.code_
+            else:
+                self.result_ = "添加产品[%s]失败！" % (self.product_)
 
 class DeleteCmd(CmdBase):
     pass
 
 if __name__ == '__main__':
-    t = YmmDB('root', 'ymm', 'xxdxx_01')
+    t = YmmDB('root', 'ymm1030', 'xxdxx_01')
     t.connect_to_db('20180709')
 
     readCmd1 = ReadProductCmd(t, 'YSL')
@@ -133,3 +172,9 @@ if __name__ == '__main__':
     addSoldAndBoughtCmd4 = AddSoldAndBoughtCmd(t, 'CleanMilk', -1, 1)
     addSoldAndBoughtCmd4.execute()
     print(addSoldAndBoughtCmd4.result())
+
+    listCmd1 = ListCmd(t, True)
+    print(listCmd1.result())
+
+    listCmd2 = ListCmd(t, False)
+    print(listCmd2.result())

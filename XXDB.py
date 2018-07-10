@@ -130,8 +130,15 @@ class YmmDB(object):
         l = [r[0] for r in l]
         return l
 
+    def records(self):
+        s = "select * from %s" % self.table_name
+        if not self.execute(s):
+            return []
+        l = self.cursor.fetchall()
+        return l
+
 if __name__ == '__main__':
-    t = YmmDB('root', 'ymm', 'xxdxx_01')
+    t = YmmDB('root', 'ymm1030', 'xxdxx_01')
     t.connect_to_db('20180709')
     t.updateRecord('YSL', 20, 10, '')
     t.updateRecord('burger', 10, 5, '')
@@ -139,3 +146,4 @@ if __name__ == '__main__':
     t.get('YSL')
     t.get('burger')
     print(t.products())
+    print(t.records())

@@ -27,9 +27,9 @@ class ReadProductCmd(CmdBase):
     def execute(self):
         l = self.db.get(self.product_)
         if len(l):
-            s = "产品：[%s] 已卖出：[%d] 已购得：[%d]" % (l[0][PRODUCT], l[0][SOLD], l[0][BOUGHT])
+            s = "[%s]卖出[%d]买入[%d]" % (l[0][PRODUCT], l[0][SOLD], l[0][BOUGHT])
             if len(l[0][3]):
-                s += " 条码：[%s]" % l[0][CODE]
+                s += "条码[%s]" % l[0][CODE]
             self.result_ = s
             self.sucessed_ = True
         else:
@@ -69,7 +69,7 @@ class AddSoldCmd(CmdBase):
         if len(l):
             new_sold = l[0][SOLD] + self.sold_added_
             if self.db.update(l[0][PRODUCT], new_sold, l[0][BOUGHT], l[0][CODE]):
-                self.result_ = "成功为产品[%s]添加了卖出数[%d],卖出数[%d->%d]" % (self.product_, self.sold_added_, l[0][SOLD], new_sold)
+                self.result_ = "成功，产品[%s]添加卖出[%d],卖出[%d->%d]" % (self.product_, self.sold_added_, l[0][SOLD], new_sold)
                 self.sucessed_ = True
             else:
                 self.result_ = "为产品[%s]添加卖出数[%d]失败！" % (self.product_, self.sold_added_)
@@ -77,7 +77,7 @@ class AddSoldCmd(CmdBase):
             if self.sold_added_ < 0:
                 self.sold_added_ = 0
             if self.db.add(self.product_, self.sold_added_, 0, ''):
-                self.result_ = "成功添加产品[%s]，卖出数[%d]" % (self.product_, self.sold_added_)
+                self.result_ = "成功，添加产品[%s]，卖出数[%d]" % (self.product_, self.sold_added_)
                 self.sucessed_ = True
             else:
                 self.result_ = "添加产品[%s]失败！" % (self.product_)
@@ -97,18 +97,18 @@ class AddSoldAndBoughtCmd(CmdBase):
             if self.db.update(l[0][PRODUCT], new_sold, new_bought, l[0][CODE]):
                 self.result_ = "成功为产品[%s]添加了" % self.product_
                 if self.sold_added_:
-                    self.result_ += "卖出数[%d],卖出数[%d->%d]和" % (self.sold_added_, l[0][SOLD], new_sold)
-                self.result_ += "买入数[%d],买入数[%d->%d]" % (self.bought_added_, l[0][BOUGHT], new_bought)
+                    self.result_ += "卖出[%d],卖出[%d->%d]和" % (self.sold_added_, l[0][SOLD], new_sold)
+                self.result_ += "买入[%d],买入[%d->%d]" % (self.bought_added_, l[0][BOUGHT], new_bought)
                 self.sucessed_ = True
             else:
-                self.result_ = "为产品[%s]添加卖出数[%d]和买入数[%d]失败！" % (self.product_, self.sold_added_, self.bought_added_)
+                self.result_ = "为产品[%s]添加卖出[%d]和买入[%d]失败！" % (self.product_, self.sold_added_, self.bought_added_)
         else:
             if self.sold_added_ < 0:
                 self.sold_added_ = 0
             if self.bought_added_ < 0:
                 self.bought_added_ = 0
             if self.db.add(self.product_, self.sold_added_, self.bought_added_, ''):
-                self.result_ = "成功添加产品[%s]，卖出数[%d]，买入数[%d]" % (self.product_, self.sold_added_, self.bought_added_)
+                self.result_ = "成功添加产品[%s]，卖出[%d]，买入[%d]" % (self.product_, self.sold_added_, self.bought_added_)
                 self.sucessed_ = True
             else:
                 self.result_ = "添加产品[%s]失败！" % (self.product_)
@@ -127,11 +127,11 @@ class ListCmd(CmdBase):
         self.result_ = ''
         for one in l:
             if self.product_only_:
-                self.result_ += one + '\n'
+                self.result_ += one + '\n\n'
             else:
-                self.result_ += "产品：[%s] 卖出[%d] 买入[%d]" % (one[PRODUCT], one[SOLD], one[BOUGHT])
+                self.result_ += "[%s]卖出[%d]买入[%d]" % (one[PRODUCT], one[SOLD], one[BOUGHT])
                 if len(one[CODE]):
-                    self.result_ += " 条码[%s]" % one[CODE]
+                    self.result_ += "条码[%s]" % one[CODE]
                 self.result_ += '\n'
         if not len(self.result_):
             self.result_ = "还没有任何条目！"

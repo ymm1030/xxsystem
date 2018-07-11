@@ -6,7 +6,7 @@ import re
 
 class XXToken(object):
     def __init__(self, db, cmd_str):
-        reg = r'[\s,.，。、]+'
+        reg = r'[,.，。、]+'
         self.tokens_ = re.split(reg, cmd_str)
         self.cmd_ = None
         self.reason_ = ''
@@ -28,7 +28,7 @@ class XXToken(object):
             self.with_parameter_2()
         elif len(self.tokens_) == 3:
             self.with_parameter_3()
-        elif len(self.tokens_) == 4:
+        else:
             self.with_parameter_4()
 
     def with_parameter_1(self):
@@ -84,8 +84,8 @@ class XXToken(object):
         p3 = self.tokens_[2]
         p4 = self.tokens_[3]
 
-        if not '重置' in p1:
-            self.reason_ = "你可能想【重置】？"
+        if (not '修改' in p1) and (not '更新' in p1):
+            self.reason_ = "你可能想【更新】或【修改】？"
         else:
             try:
                 new_sold = int(p3)
@@ -95,7 +95,7 @@ class XXToken(object):
             try:
                 new_bought = int(p4)
             except ValueError:
-                self.reason_ = "参数不对，第三个要写数字"
+                self.reason_ = "参数不对，第四个要写数字"
                 return
             self.cmd_ = XXCmd.ResetCmd(self.db_, p2, new_sold, new_bought, '')
 

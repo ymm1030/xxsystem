@@ -62,7 +62,7 @@ class YmmDB(object):
             return
         t = self.cursor.fetchall()
         if (len(t) == 0):
-            tstr = "create table " + self.table_name + "(PRODUCT varchar(512), SOLD int, BOUGHT int, CODE varchar(64), PRIMARY KEY(PRODUCT))"
+            tstr = "create table " + self.table_name + "(PRODUCT varchar(512), SOLD int, BOUGHT int, CODE varchar(64), PRIMARY KEY(PRODUCT)) DEFAULT CHARSET=utf8"
             if not self.execute(tstr):
                 return
             print('Created new table %s.' % self.table_name)

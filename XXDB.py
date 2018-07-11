@@ -1,3 +1,5 @@
+#-*- coding:utf-8 -*-
+
 import mysql.connector
 from mysql.connector import errorcode
 
@@ -5,14 +7,14 @@ class YmmDB(object):
     def __init__(self, user, passwd, table_name):
         try:
             self.conn = mysql.connector.connect(user=user, password=passwd, use_unicode=True)
+            self.table_name = table_name
+            self.cursor = self.conn.cursor()
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("MySQL connection failed: Invalid user/password.")
             else:
                 print(err)
-        self.table_name = table_name
-        self.cursor = self.conn.cursor()
-
+        
     def connected_database(self):
         return getattr(self.conn, 'database', '')
 
@@ -96,7 +98,7 @@ class YmmDB(object):
 
     def delete(self, product):
         print('Delete product:', product)
-        s = "delete from %s where product=%s" % (self.table_name, product)
+        s = "delete from %s where product='%s'" % (self.table_name, product)
         if not self.execute(s):
             return False
         self.conn.commit()

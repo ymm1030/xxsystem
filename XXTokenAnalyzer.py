@@ -2,6 +2,7 @@
 
 import XXCmd
 from XXDB import YmmDB
+from XXLog import logout
 import re
 
 class XXToken(object):
@@ -37,6 +38,8 @@ class XXToken(object):
             self.cmd_ = XXCmd.ListCmd(self.db_, True)
         elif '统计' in action:
             self.cmd_ = XXCmd.ListCmd(self.db_, False)
+        elif '导出' in action:
+            self.cmd_ = XXCmd.ExportCmd(self.db_)
         else:
             l = self.db_.products()
             l1 = []
@@ -55,6 +58,8 @@ class XXToken(object):
             self.cmd_ = XXCmd.DeleteCmd(self.db_, p2)
         elif '连接' in p1:
             self.cmd_ = XXCmd.ConnectDBCmd(self.db_, p2)
+        elif '提示' in p1:
+            self.cmd_ = XXCmd.HintCmd(self.db_, p2)
         else:
             try:
                 sold_added = int(p2)
@@ -75,7 +80,7 @@ class XXToken(object):
             bought_added = int(p3)
             self.cmd_ = XXCmd.AddSoldAndBoughtCmd(self.db_, p1, sold_added, bought_added)
         except ValueError:
-            print('Skip non-numbered parameter:', p3)
+            logout('Skip non-numbered parameter:', p3)
             self.cmd_ = XXCmd.AddSoldCmd(self.db_, p1, sold_added)
 
     def with_parameter_4(self):
@@ -106,38 +111,38 @@ if __name__ == '__main__':
     cmd = s.command()
     if cmd is not None:
         cmd.execute()
-        print(cmd.result())
+        logout(cmd.result())
     else:
-        print(s.reason())
+        logout(s.reason())
 
     s = XXToken(t, "列表")
     cmd = s.command()
     if cmd is not None:
         cmd.execute()
-        print(cmd.result())
+        logout(cmd.result())
     else:
-        print(s.reason())
+        logout(s.reason())
 
     s = XXToken(t, "统计")
     cmd = s.command()
     if cmd is not None:
         cmd.execute()
-        print(cmd.result())
+        logout(cmd.result())
     else:
-        print(s.reason())
+        logout(s.reason())
 
     s = XXToken(t, "WhiteMilk 5 5")
     cmd = s.command()
     if cmd is not None:
         cmd.execute()
-        print(cmd.result())
+        logout(cmd.result())
     else:
-        print(s.reason())
+        logout(s.reason())
 
     s = XXToken(t, "milk")
     cmd = s.command()
     if cmd is not None:
         cmd.execute()
-        print(cmd.result())
+        logout(cmd.result())
     else:
-        print(s.reason())
+        logout(s.reason())

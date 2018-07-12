@@ -1,6 +1,9 @@
 #-*- coding:utf-8 -*-
 
 from XXDB import YmmDB
+from XXLog import logout
+from XXExcel import Exporter
+import re
 
 PRODUCT = 0
 SOLD = 1
@@ -127,7 +130,7 @@ class ListCmd(CmdBase):
         self.result_ = ''
         for one in l:
             if self.product_only_:
-                self.result_ += one + '\n\n'
+                self.result_ += one + '\n'
             else:
                 self.result_ += "[%s]卖出[%d]买入[%d]" % (one[PRODUCT], one[SOLD], one[BOUGHT])
                 if len(one[CODE]):
@@ -177,7 +180,21 @@ class DeleteCmd(CmdBase):
             self.result_ = "删除产品[%s]失败！" % self.product_
 
 class ExportCmd(CmdBase):
-    pass
+    def __init__(self, db):
+        super(ExportCmd, self).__init__(db)
+    
+    def execute(self):
+        l = self.db.records()
+        if not len(l):
+            self.result_ = "还没有任何条目！"
+        else:
+            exp = Exporter(l)
+            path = getattr(exp, 'path', '')
+            if not len(path):
+                self.result_ = "导出失败!"
+            else:
+                self.path = path
+                self.sucessed_ = True
 
 class ImportCmd(CmdBase):
     pass
@@ -191,9 +208,25 @@ class ConnectDBCmd(CmdBase):
         self.db.connect_to_db(self.db_name_)
         if len(self.db.connected_database()):
             self.result_ = "已经连接数据库[%s]" % self.db_name_
+            self.connected_database = self.db.connected_database()
             self.sucessed_ = True
         else:
             self.result_ = "连接数据库[%s]失败！" % self.db_name_
+
+class HintCmd(CmdBase):
+    def __init__(self, db, hint_str):
+        super(HintCmd, self).__init__(db)
+        self.hint_str_ = hint_str
+
+    def execute(self):
+        l = self.db.products()
+        self.result_ = []
+        for one in l:
+            if re.search(self.hint_str_, one, re.IGNORECASE):
+                self.result_.append(one)
+        if not len(self.result_):
+            self.result_ = "没找到任何匹配项！"
+        self.sucessed_ = True
 
 if __name__ == '__main__':
     t = YmmDB('root', 'ymm1030', 'xxdxx_01')
@@ -201,62 +234,62 @@ if __name__ == '__main__':
 
     readCmd1 = ReadProductCmd(t, 'YSL')
     readCmd1.execute()
-    print(readCmd1.result())
+    logout(readCmd1.result())
 
     readCmd2 = ReadProductCmd(t, 'NotExist')
     readCmd2.execute()
-    print(readCmd2.result())
+    logout(readCmd2.result())
 
     addSoldCmd1 = AddSoldCmd(t, 'YSL', 2)
     addSoldCmd1.execute()
-    print(addSoldCmd1.result())
+    logout(addSoldCmd1.result())
 
     addSoldCmd2 = AddSoldCmd(t, 'NotExist', 1)
     addSoldCmd2.execute()
-    print(addSoldCmd2.result())
+    logout(addSoldCmd2.result())
 
     addSoldCmd3 = AddSoldCmd(t, 'YSL', -2)
     addSoldCmd3.execute()
-    print(addSoldCmd3.result())
+    logout(addSoldCmd3.result())
 
     addSoldCmd4 = AddSoldCmd(t, 'PP water', -2)
     addSoldCmd4.execute()
-    print(addSoldCmd4.result())
+    logout(addSoldCmd4.result())
 
     addSoldAndBoughtCmd1 = AddSoldAndBoughtCmd(t, 'YSL', 0, 1)
     addSoldAndBoughtCmd1.execute()
-    print(addSoldAndBoughtCmd1.result())
+    logout(addSoldAndBoughtCmd1.result())
 
     addSoldAndBoughtCmd2 = AddSoldAndBoughtCmd(t, 'YSL', 0, -1)
     addSoldAndBoughtCmd2.execute()
-    print(addSoldAndBoughtCmd2.result())
+    logout(addSoldAndBoughtCmd2.result())
 
     addSoldAndBoughtCmd3 = AddSoldAndBoughtCmd(t, 'YSL', -1, 1)
     addSoldAndBoughtCmd3.execute()
-    print(addSoldAndBoughtCmd3.result())
+    logout(addSoldAndBoughtCmd3.result())
 
     addSoldAndBoughtCmd4 = AddSoldAndBoughtCmd(t, 'CleanMilk', -1, 1)
     addSoldAndBoughtCmd4.execute()
-    print(addSoldAndBoughtCmd4.result())
+    logout(addSoldAndBoughtCmd4.result())
 
     listCmd1 = ListCmd(t, True)
-    print(listCmd1.result())
+    logout(listCmd1.result())
 
     listCmd2 = ListCmd(t, False)
-    print(listCmd2.result())
+    logout(listCmd2.result())
 
     resetCmd1 = ResetCmd(t, 'CleanMilk', 8, 8, '7878797970')
     resetCmd1.execute()
-    print(resetCmd1.result())
+    logout(resetCmd1.result())
 
     resetCmd2 = ResetCmd(t, 'DirtyMilk', 9, 9, '7675665765')
     resetCmd2.execute()
-    print(resetCmd2.result())
+    logout(resetCmd2.result())
 
     delCmd1 = DeleteCmd(t, 'NotExist')
     delCmd1.execute()
-    print(delCmd1.result())
+    logout(delCmd1.result())
 
     delCmd2 = DeleteCmd(t, 'DirtyMilk')
     delCmd2.execute()
-    print(delCmd2.result())
+    logout(delCmd2.result())
